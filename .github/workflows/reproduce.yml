@@ -1,0 +1,45 @@
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version:
+          - "7.4"
+          - "8.0"
+        ts:
+          - "ts"
+          - "nts"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "${{ matrix.php-version }}"
+          extensions: intl
+        env:
+          phpts: "${{ matrix.ts }}"
+
+      - name: "Install phpstan deps"
+        run: |
+          $env:COMPOSER_ROOT_VERSION = "0.12.x-dev"
+          composer install
+
+      - name: "Clone & install test repo"
+        run: |
+          $env:Path = "C:\Program Files\PHP;$env:Path"
+          cd repro
+          git clone https://github.com/atk4/ui.git && cd ui
+          composer install
+
+      - name: "Run PHPStan"
+        run: |
+          cd repro/ui
+          $env:Path = "C:\Program Files\PHP;$env:Path"
+          php --version
+          php -d memory_limit=2G ../../bin/phpstan analyse --ansi --debug --verbose
