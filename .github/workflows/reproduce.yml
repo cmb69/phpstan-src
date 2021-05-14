@@ -4,26 +4,13 @@ on:
 jobs:
   build:
     runs-on: windows-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        php-version:
-          - "7.4"
-          - "8.0"
-        ts:
-          - "ts"
-          - "nts"
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: "${{ matrix.php-version }}"
-          extensions: intl
-        env:
-          phpts: "${{ matrix.ts }}"
+      - name: "Install PHP binary" # same issue with PHP 7.4.19, installed by Chocolatey
+        run: |
+          mv repro/PHP "C:\Program Files\PHP"
 
       - name: "Install phpstan deps"
         run: |
