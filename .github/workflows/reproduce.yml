@@ -3,16 +3,22 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: "${{ matrix.runs-on }}"
     strategy:
       fail-fast: false
       matrix:
+        runs-on:
+          - "ubuntu-latest"
+          - "windows-latest"
         php-version:
           - "7.4"
           - "8.0"
         ts:
           - "ts"
           - "nts"
+        exclude:
+          - runs-on: "ubuntu-latest"
+            ts: ts
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -26,13 +32,13 @@ jobs:
           phpts: "${{ matrix.ts }}"
 
       - name: "Install phpstan deps"
+        env:
+          COMPOSER_ROOT_VERSION: "0.12.x-dev"
         run: |
-          $env:COMPOSER_ROOT_VERSION = "0.12.x-dev"
           composer install
 
       - name: "Clone & install test repo"
         run: |
-          $env:Path = "C:\Program Files\PHP;$env:Path"
           cd repro
           git clone https://github.com/atk4/ui.git && cd ui
           composer install
@@ -40,6 +46,13 @@ jobs:
       - name: "Run PHPStan"
         run: |
           cd repro/ui
-          $env:Path = "C:\Program Files\PHP;$env:Path"
           php --version
+          php ../../bin/phpstan clear-result-cache
           php -d memory_limit=2G ../../bin/phpstan analyse --ansi --debug --verbose
+
+      - name: "Run PHPStan /w opcache enabled for CLI"
+        run: |
+          cd repro/ui
+          php --version
+          php ../../bin/phpstan clear-result-cache
+          php -d memory_limit=2G -d opcache.enable=1 -d opcache.enable_cli=1 ../../bin/phpstan analyse --ansi --debug --verbose
