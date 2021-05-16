@@ -6,3 +6,5 @@
 /.idea
 /tests/tmp
 /tests/.phpunit.result.cache
+/ui
+/t_*.xt
