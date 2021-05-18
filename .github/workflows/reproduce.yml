@@ -8,17 +8,11 @@ jobs:
       fail-fast: false
       matrix:
         runs-on:
-          - "ubuntu-latest"
           - "windows-latest"
         php-version:
           - "7.4"
-          - "8.0"
         ts:
-          - "ts"
           - "nts"
-        exclude:
-          - runs-on: "ubuntu-latest"
-            ts: ts
     steps:
       - name: Checkout
         uses: actions/checkout@v2
