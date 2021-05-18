@@ -10,7 +10,7 @@ jobs:
         runs-on:
           - "windows-latest"
         php-version:
-          - "7.4"
+          - "7.3"
         ts:
           - "nts"
     steps:
