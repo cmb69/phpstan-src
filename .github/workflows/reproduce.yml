@@ -8,7 +8,7 @@ jobs:
       fail-fast: false
       matrix:
         runs-on:
-          - "ubuntu-latest"
+          - "windows-latest"
         php-version:
           - "7.4"
         ts:
@@ -21,7 +21,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: "${{ matrix.php-version }}"
-          extensions: intl,:xdebug
+          extensions: intl,xdebug
         env:
           phpts: "${{ matrix.ts }}"
 
