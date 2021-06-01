@@ -8,7 +8,7 @@ jobs:
       fail-fast: false
       matrix:
         runs-on:
-          - "windows-latest"
+          - "ubuntu-latest"
         php-version:
           - "7.4"
         ts:
@@ -21,7 +21,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: "${{ matrix.php-version }}"
-          extensions: intl
+          extensions: intl,:xdebug
         env:
           phpts: "${{ matrix.ts }}"
 
@@ -37,16 +37,16 @@ jobs:
           git clone https://github.com/atk4/ui.git && cd ui
           composer install
 
-      - name: "Run PHPStan"
-        run: |
-          cd repro/ui
-          php --version
-          php ../../bin/phpstan clear-result-cache
-          php -d memory_limit=2G ../../bin/phpstan analyse --ansi --debug --verbose
+      # - name: "Run PHPStan"
+      #   run: |
+      #     cd repro/ui
+      #     php --version
+      #     php ../../bin/phpstan clear-result-cache
+      #     php -d memory_limit=2G ../../bin/phpstan analyse --ansi --debug --verbose
 
       - name: "Run PHPStan /w opcache enabled for CLI"
         run: |
           cd repro/ui
           php --version
           php ../../bin/phpstan clear-result-cache
-          php -d memory_limit=2G -d opcache.enable=1 -d opcache.enable_cli=1 ../../bin/phpstan analyse --ansi --debug --verbose
+          php -d memory_limit=2G -d opcache.enable=1 -d opcache.enable_cli=1 -d opcache.file_cache=$GITHUB_WORKSPACE -d opcache.file_cache_only=1 ../../bin/phpstan analyse --ansi --debug --verbose
